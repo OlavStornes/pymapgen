@@ -1,31 +1,55 @@
 
 from PIL import Image 
 from opensimplex import OpenSimplex
+from biomes import *
+import math
 
-WIDTH = 512
-HEIGHT = 512
-FEATURE_SIZE = 24.0
+WIDTH = 900
+HEIGHT = 400
+FREQUENCY = 5.0
 
+
+def noise(nx, ny, gen):
+    # Rescale from -1.0:+1.0 to 0.0:1.0
+    return gen.noise2d(nx, ny) / 2.0 + 0.5
 
 def createelevation():
-    simplex = OpenSimplex()
-
     print('Generating noise from OpenSimplex...')
-    elevation = [[0 for x in range(WIDTH)] for y in range(HEIGHT)] 
+    gen = OpenSimplex(123456)
+    # os2 = OpenSimplex(22)
+    # os3 = OpenSimplex(20202)
+    
+    
+    elevation = []
     for y in range(0, HEIGHT):
+        elevation.append([0] * WIDTH)
         for x in range(0, WIDTH):
-            elevation[y][x] = simplex.noise2d(x / FEATURE_SIZE, y / FEATURE_SIZE)
-    return elevation
+            nx = x/WIDTH - 0.5
+            ny = y/HEIGHT - 0.5
+            e = (1 * noise(FREQUENCY * nx, FREQUENCY * ny, gen) +
+                0.5 * noise(2 * nx, 2 * ny, gen) + 
+                0.25 * noise(4 * nx, 4 * ny, gen))
 
+            e = math.pow(e, 4)
+            elevation[y][x] = e
+            # print (elevation[y][x])
+        
+    return elevation
 
 def saveimg(elevation):
     print ("Saving Image...")
-    im = Image.new('L', (WIDTH, HEIGHT))
+    im = Image.new('RGB', (WIDTH, HEIGHT))
     for y in range(0, HEIGHT):
         for x in range(0, WIDTH):
-            color = int((elevation[x][y] + 1) * 128)
+            e = elevation[y][x]
+            # print (e)
+            if (e < 0.15):
+                color = biome["OCEAN"]
+            else:
+                color = (0, int((e) * 128), 0)
+                # print (color)
             im.putpixel((x, y), color)
-    im.save('noise.png')
+    im.save('noise.bmp')
 
 def main():
     elevation = createelevation()
