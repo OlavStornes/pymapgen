@@ -2,6 +2,7 @@
 from PIL import Image 
 from opensimplex import OpenSimplex
 from constants import *
+from tqdm import tqdm
 import math
 import random
 
@@ -10,7 +11,7 @@ def saveimg(elevation):
 
     print ("Saving Image...")
     im = Image.new('RGB', (WIDTH, HEIGHT))
-    for y in range(0, HEIGHT):
+    for y in tqdm(range(0, HEIGHT)):
         for x in range(0, WIDTH):
             color = decidebiome(elevation[y][x])
             im.putpixel((x, y), color)
@@ -26,7 +27,7 @@ def island(e, nx, ny):
     a = ISLAND_A # Pushes everything up
     b = ISLAND_B # Pushes edges down
     c = ISLAND_C # Controls how fast the dropdown is
-    d = 2*max(abs(nx), abs(ny)) # Distance from the centre
+    d = 2*math.sqrt(nx*nx + ny*ny) # Distance from the centre
     return ((e + a) * (1 - b*d**c))
     
 
@@ -37,7 +38,7 @@ def createelevation():
     gen = OpenSimplex()    
     
     elevation = []
-    for y in range(0, HEIGHT):
+    for y in tqdm(range(0, HEIGHT)):
         elevation.append([0] * WIDTH)
         for x in range(0, WIDTH):
             nx = x/WIDTH - 0.5
@@ -70,7 +71,7 @@ def decidebiome(e):
         return biome["JUNGLE"]
     if (e < 0.80):
         return biome["ROCK"]
-    if (e < 0.85):
+    if (e < 0.95):
         return biome["MOUNTAIN"]
     else:
         return biome["SNOW"]
