@@ -6,12 +6,20 @@ import math
 
 WIDTH = 400
 HEIGHT = 400
-FREQUENCY = 15.0
+FREQUENCY = 10.0
 
 
 def noise(nx, ny, gen):
     # Rescale from -1.0:+1.0 to 0.0:1.0
     return gen.noise2d(nx, ny) / 2.0 + 0.5
+
+def island(e, nx, ny):
+    a = 0.10 # Pushes everything up
+    b = 1.10 # Pushes edges down
+    c = 1.20 # Controls how fast the dropdown is
+    d = 2*max(abs(nx), abs(ny)) # Distance from the centre
+    return ((e + a) * (1 - b*d**c))
+    
 
 def createelevation():
     print('Generating noise from OpenSimplex...')
@@ -32,7 +40,8 @@ def createelevation():
             e2 = 0.25 * noise(4 * nx, 4 * ny, gen)
 
             e = e0# + e1 + e2
-            e = math.pow(e, 2)
+            e = island(e, nx, ny)
+            # e = math.pow(e, 1.2)
             elevation[y][x] = e
             # print (elevation[y][x])
         
@@ -49,15 +58,19 @@ def saveimg(elevation):
     im.save('noise.bmp')
 
 def decidebiome(e):
-    if (e <= 0.05):
+    if (e <= 0.10):
         return biome["DEEPOCEAN"]
-    if (e < 0.30):
+    if (e < 0.25):
         return biome["OCEAN"]
-    if (e < 0.40):
-        return biome["SHORE"]
-    if (e < 0.75):
+    if (e < 0.30):
+        return biome["SHORE"]    
+    if (e < 0.55):
         return biome["FOREST"]
+    if (e < 0.70):
+        return biome["JUNGLE"]
     if (e < 0.80):
+        return biome["ROCK"]
+    if (e < 0.85):
         return biome["MOUNTAIN"]
     else:
         # print (e)
