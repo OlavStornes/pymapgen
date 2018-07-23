@@ -12,13 +12,13 @@ biome = {
     "SNOW": (255, 250, 250)
 }
 
-WIDTH = 300
-HEIGHT = 300
-FREQUENCY = 10.0
+WIDTH = 500
+HEIGHT = 500
+FREQUENCY = 15.0
 
 #### ISLAND CALCULATION ####
 ## Formula: ((e + a) * (1 - b*d**c)) ##
 
-ISLAND_A = 0.10 # Pushes everything up
-ISLAND_B = 1.10 # Pushes edges down
+ISLAND_A = 0.05 # Pushes everything up
+ISLAND_B = 1.00 # Pushes edges down
 ISLAND_C = 1.50 # Controls how fast the dropdown is
