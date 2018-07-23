@@ -4,9 +4,9 @@ from opensimplex import OpenSimplex
 from biomes import *
 import math
 
-WIDTH = 900
+WIDTH = 400
 HEIGHT = 400
-FREQUENCY = 5.0
+FREQUENCY = 15.0
 
 
 def noise(nx, ny, gen):
@@ -26,11 +26,13 @@ def createelevation():
         for x in range(0, WIDTH):
             nx = x/WIDTH - 0.5
             ny = y/HEIGHT - 0.5
-            e = (1 * noise(FREQUENCY * nx, FREQUENCY * ny, gen) +
-                0.5 * noise(2 * nx, 2 * ny, gen) + 
-                0.25 * noise(4 * nx, 4 * ny, gen))
+            # Split up different gradiants at different frequencies
+            e0 = 1.00 * noise(FREQUENCY * nx, FREQUENCY * ny, gen)
+            e1 = 0.50 * noise(2 * nx, 2 * ny, gen)
+            e2 = 0.25 * noise(4 * nx, 4 * ny, gen)
 
-            e = math.pow(e, 4)
+            e = e0# + e1 + e2
+            e = math.pow(e, 2)
             elevation[y][x] = e
             # print (elevation[y][x])
         
@@ -41,15 +43,25 @@ def saveimg(elevation):
     im = Image.new('RGB', (WIDTH, HEIGHT))
     for y in range(0, HEIGHT):
         for x in range(0, WIDTH):
-            e = elevation[y][x]
-            # print (e)
-            if (e < 0.15):
-                color = biome["OCEAN"]
-            else:
-                color = (0, int((e) * 128), 0)
-                # print (color)
+            color = decidebiome(elevation[y][x])
+            # print (color)
             im.putpixel((x, y), color)
     im.save('noise.bmp')
+
+def decidebiome(e):
+    if (e <= 0.05):
+        return biome["DEEPOCEAN"]
+    if (e < 0.30):
+        return biome["OCEAN"]
+    if (e < 0.40):
+        return biome["SHORE"]
+    if (e < 0.75):
+        return biome["FOREST"]
+    if (e < 0.80):
+        return biome["MOUNTAIN"]
+    else:
+        # print (e)
+        return biome["SNOW"]
 
 def main():
     elevation = createelevation()
