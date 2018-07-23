@@ -1,32 +1,40 @@
 
 from PIL import Image 
 from opensimplex import OpenSimplex
-from biomes import *
+from constants import *
 import math
+import random
 
-WIDTH = 400
-HEIGHT = 400
-FREQUENCY = 10.0
+def saveimg(elevation):
+    """Save data to a bmp"""
 
+    print ("Saving Image...")
+    im = Image.new('RGB', (WIDTH, HEIGHT))
+    for y in range(0, HEIGHT):
+        for x in range(0, WIDTH):
+            color = decidebiome(elevation[y][x])
+            im.putpixel((x, y), color)
+    im.save('island.bmp')
 
 def noise(nx, ny, gen):
-    # Rescale from -1.0:+1.0 to 0.0:1.0
-    return gen.noise2d(nx, ny) / 2.0 + 0.5
+    """Rescale from -1.0:+1.0 to 0.0:1.0"""
+    f = FREQUENCY
+    return gen.noise2d(nx * f, ny * f) / 2.0 + 0.5
 
 def island(e, nx, ny):
-    a = 0.10 # Pushes everything up
-    b = 1.10 # Pushes edges down
-    c = 1.20 # Controls how fast the dropdown is
+    """Generate boundaries for island creation (ie. have water on all edges"""
+    a = ISLAND_A # Pushes everything up
+    b = ISLAND_B # Pushes edges down
+    c = ISLAND_C # Controls how fast the dropdown is
     d = 2*max(abs(nx), abs(ny)) # Distance from the centre
     return ((e + a) * (1 - b*d**c))
     
 
 def createelevation():
+    """Create an elevation chart with "data" from simplex noise"""
     print('Generating noise from OpenSimplex...')
-    gen = OpenSimplex(123456)
-    # os2 = OpenSimplex(22)
-    # os3 = OpenSimplex(20202)
-    
+    # gen = OpenSimplex(random.randint(1, 99999))
+    gen = OpenSimplex()    
     
     elevation = []
     for y in range(0, HEIGHT):
@@ -34,30 +42,22 @@ def createelevation():
         for x in range(0, WIDTH):
             nx = x/WIDTH - 0.5
             ny = y/HEIGHT - 0.5
-            # Split up different gradiants at different frequencies
-            e0 = 1.00 * noise(FREQUENCY * nx, FREQUENCY * ny, gen)
-            e1 = 0.50 * noise(2 * nx, 2 * ny, gen)
-            e2 = 0.25 * noise(4 * nx, 4 * ny, gen)
 
-            e = e0# + e1 + e2
+            # Create uneven elevation points
+            e0 = 1.00 * noise(1 * nx, 1 * ny, gen)
+            e1 = 0.15 * noise(2 * nx, 2 * ny, gen)
+            e2 = 0.05 * noise(4 * nx, 4 * ny, gen)
+
+            e = e0 + e1 + e2
             e = island(e, nx, ny)
-            # e = math.pow(e, 1.2)
             elevation[y][x] = e
-            # print (elevation[y][x])
         
     return elevation
 
-def saveimg(elevation):
-    print ("Saving Image...")
-    im = Image.new('RGB', (WIDTH, HEIGHT))
-    for y in range(0, HEIGHT):
-        for x in range(0, WIDTH):
-            color = decidebiome(elevation[y][x])
-            # print (color)
-            im.putpixel((x, y), color)
-    im.save('noise.bmp')
+
 
 def decidebiome(e):
+    """Calculate which color a specific pixel will get"""
     if (e <= 0.10):
         return biome["DEEPOCEAN"]
     if (e < 0.25):
@@ -73,7 +73,6 @@ def decidebiome(e):
     if (e < 0.85):
         return biome["MOUNTAIN"]
     else:
-        # print (e)
         return biome["SNOW"]
 
 def main():
