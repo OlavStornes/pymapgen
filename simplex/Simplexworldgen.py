@@ -34,8 +34,8 @@ def island(e, nx, ny):
 def createelevation():
     """Create an elevation chart with "data" from simplex noise"""
     print('Generating noise from OpenSimplex...')
-    # gen = OpenSimplex(random.randint(1, 99999))
-    gen = OpenSimplex()    
+    gen = OpenSimplex(random.randint(1, 99999))
+    # gen = OpenSimplex()    
     
     elevation = []
     for y in tqdm(range(0, HEIGHT)):
