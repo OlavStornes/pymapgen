@@ -106,6 +106,4 @@ venv.bak/
 .vscode
 
 #Images
-*.png
-*.bmp
-
+simplex/*.png
