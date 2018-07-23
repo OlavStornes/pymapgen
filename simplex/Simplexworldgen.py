@@ -2,16 +2,15 @@
 from PIL import Image 
 from opensimplex import OpenSimplex
 from constants import *
-from tqdm import tqdm
+from tqdm import trange
 import math
 import random
 
 def saveimg(elevation):
     """Save data to a bmp"""
 
-    print ("Saving Image...")
     im = Image.new('RGB', (WIDTH, HEIGHT))
-    for y in tqdm(range(0, HEIGHT)):
+    for y in trange(0, HEIGHT, desc="Saving Image"):
         for x in range(0, WIDTH):
             color = decidebiome(elevation[y][x])
             im.putpixel((x, y), color)
@@ -33,12 +32,11 @@ def island(e, nx, ny):
 
 def createelevation():
     """Create an elevation chart with "data" from simplex noise"""
-    print('Generating noise from OpenSimplex...')
     gen = OpenSimplex(random.randint(1, 99999))
     # gen = OpenSimplex()    
     
     elevation = []
-    for y in tqdm(range(0, HEIGHT)):
+    for y in trange(0, HEIGHT, desc="Generating elevation data"):
         elevation.append([0] * WIDTH)
         for x in range(0, WIDTH):
             nx = x/WIDTH - 0.5
