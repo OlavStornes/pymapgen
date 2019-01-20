@@ -19,23 +19,26 @@ class AppWindow(QMainWindow):
         self.ui.MainImage.setScene(self.scene)
 
     def simplex_run(self):
-        height = self.ui.inputHeight.value()
-        length = self.ui.inputLength.value()
 
-        simplex = sw.SimplexGenerator(self, height, length)
+        args = {
+            'height': self.ui.inputHeight.value(),
+            'length': self.ui.inputLength.value(),
+            'calc_a': self.ui.inputCalcA.value(),
+            'calc_b': self.ui.inputCalcB.value(),
+            'calc_c': self.ui.inputCalcC.value()
+        }
+
+        simplex = sw.SimplexGenerator(self.ui.creationBar, args)
         elevation = simplex.createelevation()
 
-        for y in range(0, height):
-            for x in range(0, length):
+        for y in range(0, args['height']):
+            for x in range(0, args['length']):
                 item = QGraphicsRectItem(3 * x, 3 * y, 3, 3)
                 item.setBrush(QColor(*simplex.decidebiome(elevation[y][x])))
                 self.scene.addItem(item)
 
     def generateButton(self):
-
-        algorithm = self.ui.inputAlgorithm.currentText()
-        if algorithm == "Simplex":
-            self.simplex_run()
+        self.simplex_run()
 
 
 if __name__ == "__main__":

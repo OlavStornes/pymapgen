@@ -24,9 +24,9 @@ FREQUENCY = 15.0
 #### ISLAND CALCULATION ####
 ## Formula: ((e + a) * (1 - b*d**c)) ##
 
-ISLAND_A = 0.05  # Pushes everything up
-ISLAND_B = 1.00  # Pushes edges down
-ISLAND_C = 1.50  # Controls how fast the dropdown is
+#ISLAND_A = 0.05  # Pushes everything up
+#ISLAND_B = 1.00  # Pushes edges down
+#ISLAND_C = 1.50  # Controls how fast the dropdown is
 
 
 def saveimg(elevation):
@@ -41,10 +41,13 @@ def saveimg(elevation):
 
 
 class SimplexGenerator():
-    def __init__(self, parent, height, length):
-        self.parent = parent
-        self.height = height
-        self.length = length
+    def __init__(self, progress_bar, args):
+        self.progress_bar = progress_bar
+        self.height = args["height"]
+        self.length = args["length"]
+        self.calc_a = args["calc_a"]
+        self.calc_b = args["calc_b"]
+        self.calc_c = args["calc_c"]
 
     def noise(self, nx, ny, gen):
         """Rescale from -1.0:+1.0 to 0.0:1.0"""
@@ -53,9 +56,9 @@ class SimplexGenerator():
 
     def island(self, e, nx, ny):
         """Generate boundaries for island creation (ie. have water on all edges"""
-        a = ISLAND_A  # Pushes everything up
-        b = ISLAND_B  # Pushes edges down
-        c = ISLAND_C  # Controls how fast the dropdown is
+        a = self.calc_a  # Pushes everything up
+        b = self.calc_b  # Pushes edges down
+        c = self.calc_c  # Controls how fast the dropdown is
         d = 2 * math.sqrt(nx * nx + ny * ny)  # Distance from the centre
         return ((e + a) * (1 - b * d**c))
 
@@ -63,10 +66,8 @@ class SimplexGenerator():
         """Create an elevation chart with "data" from simplex noise"""
         gen = OpenSimplex(random.randint(1, 99999))
 
-        progress_bar = self.parent.ui.creationBar
-
         elevation = []
-        progress_bar.setMaximum(self.height)
+        self.progress_bar.setMaximum(self.height)
         for y in range(0, self.height):
             elevation.append([0] * self.length)
             for x in range(0, self.length):
@@ -81,7 +82,7 @@ class SimplexGenerator():
                 e = e0 + e1 + e2
                 e = self.island(e, nx, ny)
                 elevation[y][x] = e
-            progress_bar.setValue(y + 1)
+            self.progress_bar.setValue(y + 1)
 
         return elevation
 

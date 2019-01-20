@@ -1,11 +1,9 @@
 # Usage
 ### Simplex noise version
-In the folder `simplex`, run `Simplexworldgen.py` which will generate an image.
+Run `main.py`, and take it from there
 
 # Future planned development (soon &trade;)
 * **Generate landscapes with Voronoi Diagrams**
-* GUI-implementation
-* Better parametization 
 * More detailed enviroment
 
 # Examples
