@@ -25,17 +25,24 @@ class AppWindow(QMainWindow):
             'length': self.ui.inputLength.value(),
             'calc_a': self.ui.inputCalcA.value(),
             'calc_b': self.ui.inputCalcB.value(),
-            'calc_c': self.ui.inputCalcC.value()
+            'calc_c': self.ui.inputCalcC.value(),
+            'gradual': self.ui.inputGradual.checkState()
         }
 
-        simplex = sw.SimplexGenerator(self.ui.creationBar, args)
-        elevation = simplex.createelevation()
+        simplex = sw.SimplexGenerator(args)
+        self.ui.creationBar.setMaximum(args.get('height') * args.get('length'))
 
-        for y in range(0, args['height']):
-            for x in range(0, args['length']):
-                item = QGraphicsRectItem(3 * x, 3 * y, 3, 3)
-                item.setBrush(QColor(*simplex.decidebiome(elevation[y][x])))
-                self.scene.addItem(item)
+        counter = 0
+        for p in simplex.createelevation():
+            counter += 1
+            item = QGraphicsRectItem(3 * p.get('x'), 3 * p.get('y'), 3, 3)
+            item.setBrush(QColor(*simplex.decidebiome(p.get('elev'))))
+            self.scene.addItem(item)
+            self.ui.creationBar.setValue(counter)
+            if args.get('gradual'):
+                # Update for each 100th pixel to keep performance so-and-so
+                if counter % 100 == 0:
+                    QApplication.processEvents()
 
     def generateButton(self):
         self.simplex_run()
