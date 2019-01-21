@@ -24,25 +24,13 @@ FREQUENCY = 15.0
 #### ISLAND CALCULATION ####
 ## Formula: ((e + a) * (1 - b*d**c)) ##
 
-#ISLAND_A = 0.05  # Pushes everything up
-#ISLAND_B = 1.00  # Pushes edges down
-#ISLAND_C = 1.50  # Controls how fast the dropdown is
-
-
-def saveimg(elevation):
-    """Save data to a bmp"""
-
-    im = Image.new('RGB', (WIDTH, HEIGHT))
-    for y in trange(0, HEIGHT, desc="Saving Image"):
-        for x in range(0, WIDTH):
-            color = decidebiome(elevation[y][x])
-            im.putpixel((x, y), color)
-    im.save('island.bmp')
+# A: Pushes everything up
+# B: Pushes edges down
+# C: Controls how fast the dropdown is
 
 
 class SimplexGenerator():
-    def __init__(self, progress_bar, args):
-        self.progress_bar = progress_bar
+    def __init__(self, args):
         self.height = args["height"]
         self.length = args["length"]
         self.calc_a = args["calc_a"]
@@ -88,7 +76,6 @@ class SimplexGenerator():
                     'elev': e
                 }
 
-
     def decidebiome(self, e):
         """Calculate which color a specific pixel will get"""
         if (e <= 0.10):
@@ -107,5 +94,3 @@ class SimplexGenerator():
             return biome["MOUNTAIN"]
         else:
             return biome["SNOW"]
-
-
