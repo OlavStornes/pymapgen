@@ -1,7 +1,7 @@
 import sys
 from gui import Ui_MainWindow
 import simplex.Simplexworldgen as sw
-from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow, QStylePainter, QGraphicsRectItem, QGraphicsScene
+from PyQt5.QtWidgets import QApplication, QMainWindow, QGraphicsRectItem, QGraphicsScene
 from PyQt5.QtGui import QPainter, QColor, QPen
 
 
