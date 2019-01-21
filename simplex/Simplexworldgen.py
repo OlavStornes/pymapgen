@@ -67,7 +67,6 @@ class SimplexGenerator():
         gen = OpenSimplex(random.randint(1, 99999))
 
         elevation = []
-        self.progress_bar.setMaximum(self.height)
         for y in range(0, self.height):
             elevation.append([0] * self.length)
             for x in range(0, self.length):
@@ -82,9 +81,13 @@ class SimplexGenerator():
                 e = e0 + e1 + e2
                 e = self.island(e, nx, ny)
                 elevation[y][x] = e
-            self.progress_bar.setValue(y + 1)
 
-        return elevation
+                yield {
+                    'x': x,
+                    'y': y,
+                    'elev': e
+                }
+
 
     def decidebiome(self, e):
         """Calculate which color a specific pixel will get"""
